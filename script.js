@@ -2,7 +2,7 @@ function RandomObjectMover(obj, container) {
 	this.$object = obj;
   this.$container = container;
   this.container_is_window = container === window;
-  this.pixels_per_second = 80;
+  this.pixels_per_second = 700;
   this.current_position = { x: 0, y: 0 };
   this.is_running = false;
 }
@@ -42,6 +42,7 @@ RandomObjectMover.prototype._calcDelta = function(a, b) {
 }
 
 RandomObjectMover.prototype._moveOnce = function() {
+  setTimeout(()=>{
 		// Pick a new spot on the page
     var next = this._generateNewPosition();
     
@@ -58,6 +59,7 @@ RandomObjectMover.prototype._moveOnce = function() {
     
     // Save this new position ready for the next call.
     this.current_position = next;
+  }, 1000)
   
 };
 
@@ -108,10 +110,9 @@ movingobj.addEventListener('click', function(){
 
 var timer = document.querySelector('#timer')
 var incrtimer
-var minutes = 125
-var minuteselement = 50
-var secondselement = 10
-var begindate = new Date('Thu Jan 01 1970 00:00:30')
+var fixeddate = new Date('Thu Jan 01 1970 00:00:30')
+var begindate = fixeddate
+
 fixedTime = 30
 var count = fixedTime
 // Toolbar stuff
@@ -119,13 +120,15 @@ document.getElementById('start').addEventListener('click', function(){
   endofgamemessage.style.backgroundColor  = 'aquamarine'
   endofgamemessage.innerText  = 'Hit the moving dot as many times as 20 or more in 30 seconds'
   points.innerText = '0'
+  pointscount = 0
+  timer.innerText = ''
 
-    incrtimer = setInterval(function(){
+      incrtimer = setInterval(function(){
       console.log('i was clicked')
       count--
-      if(count < 0){
+      if(timer.innerText == '0:0'){
         clearInterval(incrtimer)
-        timer.innerText = ''
+        // timer.innerText = ''
         if(parseInt(points.innerText) < 20 || isNaN(parseInt(points.innerText))){
           endofgamemessage.innerText = 'Sorry, you lost. You can try again'
           endofgamemessage.style.backgroundColor  = 'red'
@@ -137,12 +140,13 @@ document.getElementById('start').addEventListener('click', function(){
         }
 
         x.stop();
-        begindate = new Date('Thu Jan 01 1970 00:1:18')
+        begindate = fixeddate
         count = fixedTime
 
       }
       else{
         begindate = new Date(begindate - (1000))
+        // timer.innerText = begindate.getMinutes() + ':' + begindate.getSeconds()
         timer.innerText = begindate.getMinutes() + ':' + begindate.getSeconds()
       }
   }, 1000)
@@ -202,4 +206,54 @@ window.onload = function(){
     }
   });
   */
+
+//  for the ripple Effect
+let btn = document.querySelector('#a');
+
+function ripple(e) {
+
+  // Setup
+  // let posX = this.offsetLeft;
+	// let posY = this.offsetTop;
+  var rect = this.getBoundingClientRect();
+  let posX = rect.left;
+	let posY = rect.top;
+	let buttonWidth = this.offsetWidth;
+	let buttonHeight =  this.offsetHeight;
+  
+  // Add the element
+	let ripple = document.createElement('span');
+  
+  this.appendChild(ripple);
+
+  
+ // Make it round!
+  if(buttonWidth >= buttonHeight) {
+    buttonHeight = buttonWidth;
+  } else {
+    buttonWidth = buttonHeight; 
+  }
+  
+  // Get the center of the element
+  var x = e.pageX - posX - buttonWidth / 2;
+  var y = e.pageY - posY - buttonHeight / 2;
+  
+ 
+  ripple.style.width = `${buttonWidth}px`;
+	ripple.style.height = `${buttonHeight}px`;
+	ripple.style.top = `${y}px`;
+	ripple.style.left = `${x}px`;
+	
+	ripple.classList.add('rippleAnimation');
+  this.classList.add('shadow')
+	
+	setTimeout(() => {
+		this.removeChild(ripple);
+    this.classList.remove('shadow')
+	}, 500);
+
+}
+
+btn.addEventListener('click', ripple);
+
 }
